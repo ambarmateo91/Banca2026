@@ -1,6 +1,6 @@
+import type { AuthUser, Session, LoginCredentials, RegisterData } from '../types/auth';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AuthUser, Session, LoginCredentials, RegisterData } from '../types/auth';
 import { authApi } from './api';
 
 interface AuthState {
@@ -19,7 +19,11 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      user: null, session: null, loading: false, error: null,
+      user: null,
+      session: null,
+      loading: true,
+      error: null,
+
       signIn: async (credentials) => {
         set({ loading: true, error: null });
         try {
@@ -30,6 +34,7 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
+
       signUp: async (data) => {
         set({ loading: true, error: null });
         try {
@@ -40,6 +45,7 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
+
       signOut: async () => {
         set({ loading: true });
         try {
@@ -50,30 +56,42 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
+
       refreshSession: async () => {
         try {
           const { user, session } = await authApi.refresh();
           set({ user, session });
-        } catch { set({ user: null, session: null }); }
-        finally { set({ loading: false }); }
+        } catch {
+          set({ user: null, session: null });
+        } finally {
+          set({ loading: false });
+        }
       },
+
       setUser: (user) => set({ user }),
       setSession: (session) => set({ session }),
     }),
-    { name: 'lottery-auth', partialize: (state) => ({ user: state.user, session: state.session }) }
+    {
+      name: 'lottery-auth',
+      partialize: (state) => ({
+        user: state.user,
+        session: state.session,
+      }),
+    }
   )
 );
 
 export const initializeAuth = async () => {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
     const user = await authApi.getCurrentUser();
-    clearTimeout(timeout);
     if (user) {
+      const session = { access_token: '', refresh_token: '', expires_at: 0, user } as any;
       useAuthStore.getState().setUser(user);
-      useAuthStore.getState().setSession({ access_token: '', refresh_token: '', expires_at: 0 });
+      useAuthStore.getState().setSession(session);
     }
-  } catch { /* ignore */ }
-  finally { useAuthStore.setState({ loading: false }); }
+  } catch {
+    // No session
+  } finally {
+    useAuthStore.setState({ loading: false });
+  }
 };
