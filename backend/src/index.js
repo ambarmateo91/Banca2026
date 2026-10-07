@@ -20,6 +20,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+app.use((req, _res, next) => {
+  console.log(`${req.method} ${req.originalUrl}`);
+  next();
+});
+
 app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
 app.use('/api/auth', authRoutes);
@@ -30,7 +35,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/prizes', prizeRoutes);
 
-app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }));
+app.use('/api', (req, res) => {
+  console.log(`404 sin ruta: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ error: 'Not found' });
+});
 
 app.use((err, _req, res, _next) => {
   console.error('Unhandled error', err);
