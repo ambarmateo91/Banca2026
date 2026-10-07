@@ -18,7 +18,18 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
+
+const jsonParser = express.json();
+app.use((req, res, next) => {
+  jsonParser(req, res, (err) => {
+    if (err) {
+      // Cuerpo vacío o JSON inválido: seguir con body vacío en vez de tumbar la petición
+      req.body = {};
+      return next();
+    }
+    next();
+  });
+});
 
 app.use((req, _res, next) => {
   console.log(`${req.method} ${req.originalUrl}`);
