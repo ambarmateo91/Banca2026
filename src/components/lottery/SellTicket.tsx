@@ -94,7 +94,7 @@ export function SellTicket() {
   const loadLotteries = async () => {
     try {
       const data = await getActiveLotteries();
-      setLotteries(data);
+      setLotteries(Array.isArray(data) ? data : []);
     } catch (error) {
       toast({ title: 'Error', description: 'No se pudieron cargar las loterías', variant: 'destructive' });
     }

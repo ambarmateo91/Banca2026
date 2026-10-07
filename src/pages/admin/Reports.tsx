@@ -21,7 +21,7 @@ export function AdminReports() {
       try {
         const [data, sellersData] = await Promise.all([reportsApi.getSalesSummary(), userApi.getAllSellers()]);
         setSummary(data);
-        setSellers(sellersData);
+        setSellers(Array.isArray(sellersData) ? sellersData : []);
       } catch {
         toast({ title: 'Error', description: 'No se pudo cargar el reporte', variant: 'destructive' });
       } finally {

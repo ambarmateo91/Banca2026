@@ -29,7 +29,8 @@ export function AdminPrizes() {
     }
     try {
       const { prizeApi } = await import('@/lib/api');
-      setConfigs(await prizeApi.getByLottery(id));
+      const data = await prizeApi.getByLottery(id);
+      setConfigs(Array.isArray(data) ? data : []);
     } catch {
       toast({ title: 'Error', description: 'No se pudo cargar la configuración', variant: 'destructive' });
     }
@@ -37,14 +38,15 @@ export function AdminPrizes() {
 
   const loadPayments = async () => {
     try {
-      setPayments(await prizesApi.getAll(payFilter || undefined));
+      const data = await prizesApi.getAll(payFilter || undefined);
+      setPayments(Array.isArray(data) ? data : []);
     } catch {
       toast({ title: 'Error', description: 'No se pudieron cargar los pagos', variant: 'destructive' });
     }
   };
 
   useEffect(() => {
-    lotteryApi.getAll().then(setLotteries).catch(() => undefined);
+    lotteryApi.getAll().then((data) => setLotteries(Array.isArray(data) ? data : [])).catch(() => undefined);
     loadPayments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

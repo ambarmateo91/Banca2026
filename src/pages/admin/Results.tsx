@@ -46,7 +46,8 @@ export function AdminResults() {
   const load = async () => {
     setLoading(true);
     try {
-      setItems(await resultsApi.getAll({ lottery_id: filterLottery || undefined, draw_date: filterDate || undefined }));
+      const data = await resultsApi.getAll({ lottery_id: filterLottery || undefined, draw_date: filterDate || undefined });
+      setItems(Array.isArray(data) ? data : []);
     } catch {
       toast({ title: 'Error', description: 'No se pudieron cargar los resultados', variant: 'destructive' });
     } finally {
@@ -55,7 +56,7 @@ export function AdminResults() {
   };
 
   useEffect(() => {
-    lotteryApi.getAll().then(setLotteries).catch(() => undefined);
+    lotteryApi.getAll().then((data) => setLotteries(Array.isArray(data) ? data : [])).catch(() => undefined);
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

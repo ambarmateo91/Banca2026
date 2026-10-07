@@ -29,14 +29,14 @@ export function Dashboard() {
           isAdmin ? userApi.getAllSellers() : Promise.resolve([]),
         ]);
 
-        setRecentLotteries(lotteries.slice(0, 5));
+        setRecentLotteries(Array.isArray(lotteries) ? lotteries.slice(0, 5) : []);
 
         if (isAdmin) {
           setStats({
             totalSales: salesSummary.total_sales,
             totalTickets: salesSummary.total_tickets,
             totalRevenue: salesSummary.total_revenue,
-            activeUsers: sellers.length,
+            activeUsers: Array.isArray(sellers) ? sellers.length : 0,
           });
         } else {
           setStats({

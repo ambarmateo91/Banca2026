@@ -37,7 +37,10 @@ async function fetchApi<T>(url: string, options: RequestInit = {}): Promise<T> {
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
-    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    if (!response.ok) {
+      const errText = await response.text().catch(() => '');
+      throw new Error(`API ${response.status} ${url} - ${errText.slice(0, 200)}`);
+    }
     if (response.status === 204) return null as T;
     const text = await response.text();
     return (text ? JSON.parse(text) : null) as T;

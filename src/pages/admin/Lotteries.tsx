@@ -32,7 +32,8 @@ export function AdminLotteries() {
   const load = async () => {
     setLoading(true);
     try {
-      setItems(await lotteryApi.getAll());
+      const data = await lotteryApi.getAll();
+      setItems(Array.isArray(data) ? data : []);
     } catch {
       toast({ title: 'Error', description: 'No se pudieron cargar las loterías', variant: 'destructive' });
     } finally {

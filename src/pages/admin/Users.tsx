@@ -42,7 +42,8 @@ export function AdminUsers() {
   const load = async () => {
     setLoading(true);
     try {
-      setItems(await userApi.getAll());
+      const data = await userApi.getAll();
+      setItems(Array.isArray(data) ? data : []);
     } catch {
       toast({ title: 'Error', description: 'No se pudieron cargar los usuarios', variant: 'destructive' });
     } finally {
