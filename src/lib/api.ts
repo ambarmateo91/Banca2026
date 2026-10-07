@@ -31,9 +31,10 @@ async function fetchApi<T>(url: string, options: RequestInit = {}): Promise<T> {
   const timeoutId = setTimeout(() => controller.abort(), 5000);
 
   try {
+    const hasBody = options.body !== undefined && options.body !== null;
     const response = await fetch(url, {
-      headers: { 'Content-Type': 'application/json', ...options.headers },
       ...options,
+      headers: { ...(hasBody ? { 'Content-Type': 'application/json' } : {}), ...options.headers },
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
