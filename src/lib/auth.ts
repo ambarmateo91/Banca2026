@@ -81,17 +81,29 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-export const initializeAuth = async () => {
-  try {
-    const user = await authApi.getCurrentUser();
-    if (user) {
-      const session = { access_token: '', refresh_token: '', expires_at: 0, user } as any;
-      useAuthStore.getState().setUser(user);
-      useAuthStore.getState().setSession(session);
-    }
-  } catch {
-    // No session
-  } finally {
-    useAuthStore.setState({ loading: false });
+let initPromise: Promise<void> | null = null;
+let initialized = false;
+
+export const initializeAuth = () => {
+  if (initialized) return Promise.resolve();
+  if (!initPromise) {
+    initPromise = (async () => {
+      try {
+        const user = await authApi.getCurrentUser();
+        if (user) {
+          const session = { access_token: '', refresh_token: '', expires_at: 0, user } as any;
+          useAuthStore.getState().setUser(user);
+          useAuthStore.getState().setSession(session);
+        }
+      } catch {
+        // No session
+      } finally {
+        useAuthStore.setState({ loading: false });
+        initialized = true;
+      }
+    })().finally(() => {
+      initPromise = null;
+    });
   }
+  return initPromise;
 };
