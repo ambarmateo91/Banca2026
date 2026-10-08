@@ -17,4 +17,16 @@ export default defineConfig({
       '/api': 'http://localhost:3000',
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query', 'zustand'],
+          forms: ['react-hook-form', '@hookform/resolvers', 'zod'],
+          ui: ['lucide-react', 'sonner'],
+        },
+      },
+    },
+  },
 });
